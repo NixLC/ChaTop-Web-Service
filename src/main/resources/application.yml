@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: rentals-service
+
+# MariaDB configuration
+  datasource:
+    url: jdbc:mariadb://localhost:3306/rentals
+    username: rentals
+    password: rentals
+    driver-class-name: org.mariadb.jdbc.Driver
+
+# Spring JPA configuration
+  jpa:
+    show-sql: true
+    # Ensure that Hibernate session is active during HTTP request
+    open-in-view: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        # Use exact table names (case-sensitive) as specified by @Table (name = "xyz") directive
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+# Server configuration
+server:
+  port: 8080
