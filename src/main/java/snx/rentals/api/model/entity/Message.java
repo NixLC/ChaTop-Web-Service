@@ -5,9 +5,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import snx.rentals.api.model.dto.DTO;
+import snx.rentals.api.model.dto.MessageDto;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @EqualsAndHashCode
 @Getter
@@ -55,6 +58,17 @@ public class Message implements Serializable, GenericEntity<Message> {
 
     @Override
     public DTO<Message> toDTO() {
-        return null;
+        MessageDto dto = new MessageDto();
+        dto.setId(id);
+        dto.setRentalId(rental.getId());
+        dto.setUserId(user.getId());
+        dto.setMessage(message);
+        dto.setCreatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                          .withZone(ZoneId.systemDefault())
+                                          .format(createdAt));
+        dto.setUpdatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                          .withZone(ZoneId.systemDefault())
+                                          .format(updatedAt));
+        return dto;
     }
 }
