@@ -6,7 +6,5 @@ import snx.rentals.api.model.entity.Rental;
 @Repository
 public interface RentalRepository extends GenericRepository<Rental> {
     @Override
-    default Class<Rental> getEntityClass() {
-        return Rental.class;
-    }
+    default Class<Rental> getEntityClass() { return Rental.class; }
 }
