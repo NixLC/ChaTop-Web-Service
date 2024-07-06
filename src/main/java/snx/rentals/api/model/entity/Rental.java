@@ -5,10 +5,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import snx.rentals.api.model.dto.DTO;
+import snx.rentals.api.model.dto.RentalDto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -73,6 +76,20 @@ public class Rental implements Serializable, GenericEntity<Rental> {
 
     @Override
     public DTO<Rental> toDTO() {
-        return null;
+         RentalDto dto = new RentalDto();
+         dto.setId(id);
+         dto.setName(name);
+         dto.setSurface(surface);
+         dto.setPrice(price);
+         dto.setPicture(picture);
+         dto.setDescription(description);
+         dto.setOwnerId(owner.getId());
+         dto.setCreatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                         .withZone(ZoneId.systemDefault())
+                                         .format(createdAt));
+         dto.setUpdatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                         .withZone(ZoneId.systemDefault())
+                                         .format(createdAt));
+         return dto;
     }
 }
