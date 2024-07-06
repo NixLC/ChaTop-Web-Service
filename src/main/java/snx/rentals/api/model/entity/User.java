@@ -70,8 +70,12 @@ public class User implements Serializable, GenericEntity<User> {
         dto.setId(id);
         dto.setName(name);
         dto.setEmail(email);
-        dto.setCreatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneId.systemDefault()).format(createdAt));
-        dto.setUpdatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneId.systemDefault()).format(updatedAt));
+        dto.setCreatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                          .withZone(ZoneId.systemDefault())
+                                          .format(createdAt));
+        dto.setUpdatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                                          .withZone(ZoneId.systemDefault())
+                                          .format(updatedAt));
         return dto;
     }
 }
