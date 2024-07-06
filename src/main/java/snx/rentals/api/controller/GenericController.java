@@ -1,5 +1,6 @@
 package snx.rentals.api.controller;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +22,11 @@ public abstract class GenericController<T extends GenericEntity<T>> {
     }
 
     @GetMapping("")
-    public ResponseEntity<WrapperDto<T>> getPage(Pageable pageable){
+    public ResponseEntity<WrapperDto<T>> getPage(@RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page, size);
         List<DTO<T>> entities = service.getPage(pageable).map(GenericEntity::toDTO).toList();
         return ResponseEntity.ok(new WrapperDto<>(entities, collectionName));
-    }
-
-    public ResponseEntity<T> getOne(Integer id){
-        return ResponseEntity.ok(service.get(id));
     }
 
     @GetMapping("/{id}")
