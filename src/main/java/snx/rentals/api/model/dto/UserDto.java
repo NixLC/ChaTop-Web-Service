@@ -18,9 +18,9 @@ public class UserDto implements DTO<User> {
 
   @Override
   public User toPartialEntity() {
-    User user = new User();
-    user.setEmail(email);
-    user.setName(name);
-    return user;
+    User u = new User();
+    u.setEmail(email);
+    u.setName(name);
+    return u;
   }
 }
