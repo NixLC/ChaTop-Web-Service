@@ -8,8 +8,9 @@ spring:
     username: rentals
     password: rentals
     driver-class-name: org.mariadb.jdbc.Driver
-
-# Spring JPA configuration
+    hikari:
+      connection-timeout: 3000
+  # Spring JPA configuration
   jpa:
     show-sql: true
     # Ensure that Hibernate session is active during HTTP request
@@ -22,4 +23,4 @@ spring:
 
 # Server configuration
 server:
-  port: 8080
+  port: 3001
