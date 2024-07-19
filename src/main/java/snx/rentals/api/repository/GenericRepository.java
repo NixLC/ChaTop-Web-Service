@@ -5,9 +5,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 import snx.rentals.api.model.entity.GenericEntity;
 
 @NoRepositoryBean
-public interface GenericRepository<T extends GenericEntity<T>> extends JpaRepository<T, Integer> {
-    Class<T> getEntityClass();
-    default String getCollectionName() {
-     return getEntityClass().getSimpleName().toLowerCase().concat("s");
-    }
+public interface GenericRepository<T extends GenericEntity<?>> extends JpaRepository<T, Integer> {
 }
