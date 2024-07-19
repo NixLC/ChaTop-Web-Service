@@ -1,95 +1,88 @@
 package snx.rentals.api.model.entity;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import snx.rentals.api.model.dto.DTO;
 import snx.rentals.api.model.dto.RentalDto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@EqualsAndHashCode
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "RENTALS")
 public class Rental implements Serializable, GenericEntity<Rental> {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false, updatable = false)
+  private Integer id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "surface", precision = 10)
-    private BigDecimal surface;
+  @Column(name = "surface", precision = 10)
+  private BigDecimal surface;
 
-    @Column(name = "price", precision = 10)
-    private BigDecimal price;
+  @Column(name = "price", precision = 10)
+  private BigDecimal price;
 
-    @Column(name = "picture")
-    private String picture;
+  @Column(name = "picture")
+  private String picture;
 
-    @Column(name = "description", length = 2000)
-    private String description;
+  @Column(name = "description", length = 2000)
+  private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "owner_id", nullable = false)
+  private User owner;
 
-    @Column(name = "created_at")
-    private Instant createdAt;
+  @CreatedDate
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @Column(name = "updated_at")
-    private Instant updatedAt;
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
-    @OneToMany(mappedBy = "rental")
-    private Set<Message> messages = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "rental")
+  private Set<Message> messages = new LinkedHashSet<>();
 
-    @Override
-    public void update(Rental entity) {
-        this.name = entity.getName();
-        this.surface = entity.getSurface();
-        this.price = entity.getPrice();
-        this.picture = entity.getPicture();
-        this.description = entity.getDescription();
-        this.owner = entity.getOwner();
-        this.createdAt = entity.getCreatedAt();
-        this.updatedAt = entity.getUpdatedAt();
-        this.messages.addAll(entity.getMessages());
-    }
+  @Override
+  public void update(Rental entity) {
+    this.name = entity.getName();
+    this.surface = entity.getSurface();
+    this.price = entity.getPrice();
+    this.picture = entity.getPicture();
+    this.description = entity.getDescription();
+    this.owner = entity.getOwner();
+    this.updatedAt = Instant.now();
+  }
 
-    @Override
-    public Rental createNewInstance() {
-        Rental newInstance = new Rental();
-        newInstance.update(this);
-        return newInstance;
-    }
-
-    @Override
-    public DTO<Rental> toDTO() {
-         RentalDto dto = new RentalDto();
-         dto.setId(id);
-         dto.setName(name);
-         dto.setSurface(surface);
-         dto.setPrice(price);
-         dto.setPicture(picture);
-         dto.setDescription(description);
-         dto.setOwnerId(owner.getId());
-         dto.setCreatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
-                                         .withZone(ZoneId.systemDefault())
-                                         .format(createdAt));
-         dto.setUpdatedAt(DateTimeFormatter.ofPattern("yyyy/MM/dd")
-                                         .withZone(ZoneId.systemDefault())
-                                         .format(createdAt));
-         return dto;
-    }
+  @Override
+  public DTO<Rental> toDTO() {
+    return RentalDto.builder()
+      .id(id)
+      .name(name)
+      .surface(surface)
+      .price(price)
+      .pictureUrl(picture)
+      .description(description)
+      .ownerId(owner.getId())
+      .createdAt(DTO.instantToString(getCreatedAt(), DTO.DEFAULT_DATE_FORMATTER))
+      .updatedAt(DTO.instantToString(getUpdatedAt(), DTO.DEFAULT_DATE_FORMATTER))
+      .build();
+  }
 }
