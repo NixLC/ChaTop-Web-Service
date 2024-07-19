@@ -2,52 +2,44 @@ package snx.rentals.api.controller;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import snx.rentals.api.model.dto.DTO;
-import snx.rentals.api.model.dto.WrapperDto;
 import snx.rentals.api.model.entity.GenericEntity;
-import snx.rentals.api.repository.GenericRepository;
 import snx.rentals.api.service.GenericService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public abstract class GenericController<T extends GenericEntity<T>> {
-    private final GenericService<T> service;
-    private final String collectionName;
+  private final GenericService<T> service;
+  protected final String COLLECTION_NAME;
 
-    public GenericController(GenericRepository<T> repository) {
-        this.service = new GenericService<>(repository) {};
-        this.collectionName = repository.getCollectionName();
-    }
+  public GenericController(GenericService<T> service) {
+    this.service = service;
+    this.COLLECTION_NAME = service.getCollectionName();
+  }
 
-    @GetMapping("")
-    public ResponseEntity<WrapperDto<T>> getPage(@RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size){
-        Pageable pageable = PageRequest.of(page, size);
-        List<DTO<T>> entities = service.getPage(pageable).map(GenericEntity::toDTO).toList();
-        return ResponseEntity.ok(new WrapperDto<>(entities, collectionName));
-    }
+  public Map<String, List<DTO<T>>> getPage(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    List<DTO<T>> entities = service.getPage(pageable).map(GenericEntity::toDTO).toList();
+    return Collections.singletonMap(COLLECTION_NAME, entities);
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DTO<T>> get(@PathVariable Integer id) {
-        T entity = service.get(id);
-        return ResponseEntity.ok(entity.toDTO());
-    }
+  public DTO<T> get(Integer id) {
+    T entity = service.get(id);
+    return entity.toDTO();
+  }
 
-    @PutMapping("")
-    public ResponseEntity<T> update(@RequestBody T updated){
-        return ResponseEntity.ok(service.update(updated));
-    }
+  public DTO<T> create(T candidate) {
+    return service.create(candidate).toDTO();
+  }
 
-    @PostMapping("")
-    public ResponseEntity<T> create(@RequestBody T created){
-        return ResponseEntity.ok(service.create(created));
-    }
+  public DTO<T> update(T candidate) {
+    return service.update(candidate).toDTO();
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Integer id){
-        service.delete(id);
-        return ResponseEntity.ok("Ok");
-    }
+  public boolean delete(Integer id) {
+    service.delete(id);
+    return true;
+  }
 }
