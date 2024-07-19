@@ -13,7 +13,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import snx.rentals.api.model.dto.DTO;
 import snx.rentals.api.model.dto.RentalDto;
-import snx.rentals.api.model.entity.Message;
 import snx.rentals.api.model.entity.Rental;
 import snx.rentals.api.model.entity.User;
 import snx.rentals.api.service.RentalService;

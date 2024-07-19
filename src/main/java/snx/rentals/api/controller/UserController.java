@@ -9,13 +9,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import snx.rentals.api.model.dto.DTO;
+import snx.rentals.api.model.dto.JwtResponse;
 import snx.rentals.api.model.dto.LoginDto;
 import snx.rentals.api.model.dto.UserDto;
 import snx.rentals.api.model.entity.User;
-import snx.rentals.api.model.dto.JwtResponse;
 import snx.rentals.api.service.JwtService;
 import snx.rentals.api.service.UserService;
 
@@ -35,7 +34,7 @@ public class UserController extends GenericController<User> {
 
   @PostMapping("/register")
   public HttpEntity<DTO<User>> register(@Valid @RequestBody UserDto dto) {
-    DTO<User> created = null;
+    DTO<User> created;
     try {
       created = create(dto.toEntity());
     }
