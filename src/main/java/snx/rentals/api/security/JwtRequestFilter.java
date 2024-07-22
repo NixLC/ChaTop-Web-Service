@@ -25,10 +25,13 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
   public static final String AUTHORIZATION_HEADER = "Authorization";
   public static final String BEARER_PREFIX = "Bearer ";
-  @Autowired
-  private JwtService jwtService;
-  @Autowired
-  private UserDetailsService userService;
+  private final JwtService jwtService;
+  private final UserDetailsService userService;
+
+  public JwtRequestFilter(JwtService jwtService, UserDetailsService userService) {
+    this.jwtService = jwtService;
+    this.userService = userService;
+  }
 
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
