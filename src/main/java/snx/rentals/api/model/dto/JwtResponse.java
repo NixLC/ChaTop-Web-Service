@@ -1,4 +1,4 @@
 package snx.rentals.api.model.dto;
 
-public record JwtResponse(String jwt, long expiresIn) {
+public record JwtResponse(String token, long expiresIn) {
 }
