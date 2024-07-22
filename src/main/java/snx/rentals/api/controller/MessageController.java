@@ -1,5 +1,7 @@
 package snx.rentals.api.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpEntity;
@@ -17,8 +19,12 @@ import snx.rentals.api.service.MessageService;
 import java.util.Collections;
 import java.util.Map;
 
+import static snx.rentals.api.config.OpenApiConfig.BEARER_AUTH;
+
 @RestController
 @RequestMapping("/api/messages")
+@Tag(name = "Messages")
+@SecurityRequirement(name = BEARER_AUTH)
 public class MessageController extends GenericController<Message> {
   private final MessageService messages;
 
