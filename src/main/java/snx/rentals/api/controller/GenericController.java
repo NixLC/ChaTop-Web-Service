@@ -1,14 +1,12 @@
 package snx.rentals.api.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import snx.rentals.api.model.dto.DTO;
+import snx.rentals.api.model.dto.WrapperDto;
 import snx.rentals.api.model.entity.GenericEntity;
 import snx.rentals.api.service.GenericService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 public abstract class GenericController<T extends GenericEntity<T>> {
   private final GenericService<T> service;
@@ -19,10 +17,10 @@ public abstract class GenericController<T extends GenericEntity<T>> {
     this.COLLECTION_NAME = service.getCollectionName();
   }
 
-  public Map<String, List<DTO<T>>> getPage(int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    List<DTO<T>> entities = service.getPage(pageable).map(GenericEntity::toDTO).toList();
-    return Collections.singletonMap(COLLECTION_NAME, entities);
+  public WrapperDto<T> getPage(int page, int size) {
+    Pageable pageable = PageRequest.of(page -1, size);
+    Page<DTO<T>> dtos = service.getPage(pageable).map(GenericEntity::toDTO);
+    return new WrapperDto<>(dtos, COLLECTION_NAME);
   }
 
   public DTO<T> get(Integer id) {

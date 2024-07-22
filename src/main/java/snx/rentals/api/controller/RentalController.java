@@ -1,5 +1,9 @@
 package snx.rentals.api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -7,12 +11,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import snx.rentals.api.model.dto.DTO;
 import snx.rentals.api.model.dto.RentalDto;
+import snx.rentals.api.model.dto.WrapperDto;
 import snx.rentals.api.model.entity.Rental;
 import snx.rentals.api.model.entity.User;
 import snx.rentals.api.service.RentalService;
@@ -22,12 +29,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static snx.rentals.api.config.OpenApiConfig.BEARER_AUTH;
+
 @RestController
 @RequestMapping("/api/rentals")
+@SecurityRequirement(name = BEARER_AUTH)
+@Tag(name = "Rentals")
 public class RentalController extends GenericController<Rental> {
   public static final String NO_ID = "IdNotAllowed";
   private final RentalService rentals;
@@ -41,9 +51,14 @@ public class RentalController extends GenericController<Rental> {
     this.rentals = service;
   }
 
+  @Operation(description = "Get a list of rentals",
+    parameters = {
+      @Parameter(name = "page"),
+      @Parameter(name = "size")})
   @GetMapping("")
-  public ResponseEntity<Map<String, List<DTO<Rental>>>> getSome(@RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "10") int size) {
+  public ResponseEntity<WrapperDto<Rental>> getSome(
+      @RequestParam(name = "page", defaultValue = "1", required = false) int page,
+      @RequestParam(name = "size", defaultValue = "10", required = false) int size) {
     return ResponseEntity.ok(getPage(page, size));
   }
 
@@ -52,8 +67,8 @@ public class RentalController extends GenericController<Rental> {
     return ResponseEntity.ok(get(id));
   }
 
-  // Prevent id binding because JPA will update the entity if exists in the database
-  // Prevent ownerId binding via request parameters because it's already set by @PathVariable
+  // Prevent id binding because JPA will try to update the entity instead of creating a new one if it's id is found in the database
+  // Prevent ownerId binding via request parameters because we shouldn't be able to modify a rental owner
   @InitBinder("rentalDto")
   public void initBinder(WebDataBinder binder) {
     binder.setDisallowedFields("id");
@@ -61,13 +76,15 @@ public class RentalController extends GenericController<Rental> {
   }
 
 
-  @PostMapping(path = "/{ownerId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  HttpEntity<Map<String, String>> createOne(@PathVariable Integer ownerId, @ModelAttribute RentalDto dto, @RequestParam("picture") MultipartFile picture) {
+  @PostMapping(path = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  HttpEntity<Map<String, String>> createOne(@AuthenticationPrincipal UserDetails userDetails,
+                                            @ModelAttribute RentalDto dto,
+                                            @RequestParam("picture") MultipartFile picture) {
     if (!uploadDirIsWritable()) {
       throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Can't upload file");
     }
     try {
-      User owner = rentals.findOwner(ownerId);
+      User owner = (User) userDetails;
       Rental candidate = dto.toEntity();
       candidate.setOwner(owner);
       candidate = rentals.create(candidate);
