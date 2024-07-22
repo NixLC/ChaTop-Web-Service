@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,20 +21,39 @@ import snx.rentals.api.security.JwtRequestFilter;
  */
 @Configuration
 public class SecurityConfig {
-  @Autowired
-  private JwtRequestFilter jwtRequestFilter;
+  private final JwtRequestFilter jwtRequestFilter;
+
+  public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+    this.jwtRequestFilter = jwtRequestFilter;
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(auth -> {
-          auth.requestMatchers("/api/auth/login").permitAll()
-              .anyRequest().authenticated();
-        })
+        .authorizeHttpRequests(auth -> auth.requestMatchers(
+          "/api/auth/register",
+          "/api/auth/login",
+
+          "v3/api-docs",
+          "v3/api-docs/**",
+          "swagger-ui/**",
+          "/swagger-ui.html"
+//            "/swagger-resources",
+//            "/swagger-resources/**",
+//            "/configuration/ui",
+//            "/configuration/security",
+//            "/webjars/**",
+        ).permitAll()
+                                         .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  @Bean
+  WebSecurityCustomizer configureWebSecurity() {
+    return (web) -> web.ignoring().requestMatchers("/uploads/**");
   }
 
   @Bean
