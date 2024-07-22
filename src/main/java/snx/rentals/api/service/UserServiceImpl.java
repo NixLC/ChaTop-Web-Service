@@ -8,7 +8,7 @@ import snx.rentals.api.repository.UserRepository;
 
 @Service
 public class UserServiceImpl extends AbstractGenericService<User> implements UserService {
-  UserRepository userRepository;
+  private final UserRepository userRepository;
   public UserServiceImpl(UserRepository repository) {
     super(repository);
     this.userRepository = repository;
