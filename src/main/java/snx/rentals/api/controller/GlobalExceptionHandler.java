@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     private static Map<String, List<String>> produceMessages(Throwable ex) {
-        List<String> messages = new LinkedList<>();;
+        List<String> messages = new LinkedList<>();
         while (ex != null && ex.getMessage() != null) {
             messages.add(ex.getMessage());
             ex = ex.getCause();
