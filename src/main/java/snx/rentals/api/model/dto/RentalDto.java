@@ -1,6 +1,7 @@
 package snx.rentals.api.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import snx.rentals.api.model.entity.Rental;
+import snx.rentals.api.model.serializer.UrlSerializer;
 
 import java.math.BigDecimal;
 
@@ -29,6 +31,7 @@ public class RentalDto implements DTO<Rental> {
   @NotNull
   @Digits(integer = 10, fraction = 2)
   private BigDecimal price;
+  @JsonSerialize(using = UrlSerializer.class)
   @JsonProperty(value= "picture" , access = JsonProperty.Access.READ_ONLY)
   private String pictureUrl;
   @NotBlank
