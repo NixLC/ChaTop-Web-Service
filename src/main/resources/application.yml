@@ -4,10 +4,6 @@ spring:
 
 # MariaDB configuration
   datasource:
-    url: jdbc:mariadb://localhost:3306/rentals
-    username: rentals
-    password: rentals
-    driver-class-name: org.mariadb.jdbc.Driver
     hikari:
       connection-timeout: 3000
   # Spring JPA configuration
@@ -20,7 +16,3 @@ spring:
       naming:
         # Use exact table names (case-sensitive) as specified by @Table (name = "xyz") directive
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-# Server configuration
-server:
-  port: 3001
