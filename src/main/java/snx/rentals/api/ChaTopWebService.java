@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RentalsServiceApplication {
+public class ChaTopWebService {
 	public static void main(String[] args) {
-		SpringApplication.run(RentalsServiceApplication.class, args);
+		SpringApplication.run(ChaTopWebService.class, args);
 	}
 }
