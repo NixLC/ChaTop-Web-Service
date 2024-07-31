@@ -1,7 +1,6 @@
 package snx.rentals.api.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpEntity;
@@ -18,21 +17,20 @@ import snx.rentals.api.model.dto.JwtResponse;
 import snx.rentals.api.model.dto.LoginDto;
 import snx.rentals.api.model.dto.UserDto;
 import snx.rentals.api.model.entity.User;
+import snx.rentals.api.model.view.DtoViews;
 import snx.rentals.api.service.JwtService;
 import snx.rentals.api.service.UserService;
 
-import static snx.rentals.api.config.OpenApiConfig.BEARER_AUTH;
-
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Authentication")
 public class AuthController extends GenericController<User> {
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
   private final UserService users;
   private final PasswordEncoder passwordEncoder;
 
-  public AuthController(UserService service, AuthenticationManager authenticationManager, JwtService jwtService, PasswordEncoder passwordEncoder) {
+  public AuthController(UserService service, AuthenticationManager authenticationManager,
+                        JwtService jwtService, PasswordEncoder passwordEncoder) {
     super(service);
     this.users = service;
     this.authenticationManager = authenticationManager;
@@ -41,7 +39,10 @@ public class AuthController extends GenericController<User> {
   }
 
   @PostMapping("/register")
-  public HttpEntity<DTO<User>> register(@Valid @RequestBody UserDto dto) {
+  @JsonView({DtoViews.Read.class})
+  public HttpEntity<DTO<User>> register(@Valid
+                                        @JsonView(DtoViews.Write.class)
+                                        @RequestBody UserDto dto) {
     dto.setPassword(passwordEncoder.encode(dto.getPassword()));
     DTO<User> created;
     try {
@@ -54,14 +55,17 @@ public class AuthController extends GenericController<User> {
   }
 
   @PostMapping("/login")
-  public HttpEntity<JwtResponse> login(@Valid @RequestBody LoginDto credentials) {
+  @JsonView({DtoViews.Read.class})
+  public HttpEntity<JwtResponse> login(@Valid
+                                       @JsonView({DtoViews.Write.class})
+                                       @RequestBody LoginDto credentials) {
     UserDetails userDetails = authenticate(credentials);
     String jwtToken = jwtService.generateToken(userDetails);
     return ResponseEntity.ok(new JwtResponse(jwtToken, jwtService.getExpirationTime()));
   }
 
-  @SecurityRequirement(name = BEARER_AUTH)
   @GetMapping("/me")
+  @JsonView({DtoViews.Read.class})
   public HttpEntity<DTO<User>> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
     DTO<User> user = ((User) userDetails).toDTO();
     return ResponseEntity.ok(user);
