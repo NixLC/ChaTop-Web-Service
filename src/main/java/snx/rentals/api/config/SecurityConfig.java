@@ -1,12 +1,10 @@
 package snx.rentals.api.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,9 +20,13 @@ import snx.rentals.api.security.JwtRequestFilter;
 @Configuration
 public class SecurityConfig {
   private final JwtRequestFilter jwtRequestFilter;
+  private final Http401UnauthorizedEntryPoint entryPoint;
 
-  public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+  public static final String RENTAL_UPLOAD_WEB = "/img/rentals";
+
+  public SecurityConfig(JwtRequestFilter jwtRequestFilter, Http401UnauthorizedEntryPoint entryPoint) {
     this.jwtRequestFilter = jwtRequestFilter;
+    this.entryPoint = entryPoint;
   }
 
   @Bean
@@ -33,27 +35,26 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth.requestMatchers(
           "/api/auth/register",
           "/api/auth/login",
+            RENTAL_UPLOAD_WEB +"/**",
+          "/openapi.yml",
 
           "v3/api-docs",
           "v3/api-docs/**",
           "swagger-ui/**",
-          "/swagger-ui.html"
-//            "/swagger-resources",
-//            "/swagger-resources/**",
-//            "/configuration/ui",
-//            "/configuration/security",
-//            "/webjars/**",
+          "/swagger-ui.html",
+          "/swagger-resources",
+          "/swagger-resources/**",
+          "/configuration/ui",
+          "/configuration/security",
+          "/webjars/**"
         ).permitAll()
-                                         .anyRequest().authenticated())
+        .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint(entryPoint));
 
     return http.build();
-  }
-
-  @Bean
-  WebSecurityCustomizer configureWebSecurity() {
-    return (web) -> web.ignoring().requestMatchers("/uploads/**");
   }
 
   @Bean
