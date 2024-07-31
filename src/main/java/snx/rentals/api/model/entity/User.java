@@ -26,7 +26,7 @@ import java.util.Set;
 @Builder(toBuilder = true)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "USERS")
+@Table(name = "users")
 public class User implements UserDetails, Serializable, GenericEntity<User> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,7 +61,6 @@ public class User implements UserDetails, Serializable, GenericEntity<User> {
         this.name = entity.getEntityName();
         this.email = entity.getEmail();
         this.password = entity.getPassword();
-        this.updatedAt = Instant.now();
     }
 
     @Override

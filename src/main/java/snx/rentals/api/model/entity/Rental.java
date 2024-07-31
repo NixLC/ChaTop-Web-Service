@@ -20,10 +20,10 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "RENTALS")
+@Table(name = "rentals")
 public class Rental implements Serializable, GenericEntity<Rental> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +68,6 @@ public class Rental implements Serializable, GenericEntity<Rental> {
     this.picture = entity.getPicture();
     this.description = entity.getDescription();
     this.owner = entity.getOwner();
-    this.updatedAt = Instant.now();
   }
 
   @Override
