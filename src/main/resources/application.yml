@@ -1,8 +1,7 @@
 spring:
   application:
     name: rentals-service
-
-# MariaDB configuration
+  # MariaDB configuration
   datasource:
     hikari:
       connection-timeout: 3000
@@ -16,3 +15,11 @@ spring:
       naming:
         # Use exact table names (case-sensitive) as specified by @Table (name = "xyz") directive
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  jackson:
+    mapper:
+      default-view-inclusion: false
+springdoc:
+  swagger-ui:
+    url: /openapi.yml
+  api-docs:
+    enabled: true
