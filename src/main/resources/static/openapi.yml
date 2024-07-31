@@ -1,0 +1,443 @@
+openapi: 3.1.0
+info:
+  title: Rental Web Service - OpenAPI 3.1
+  description: |-
+    This API provides rental management
+  version: 1.0.0
+tags:
+  - name: Auth
+    description: Provide registration & authentication
+  - name: User
+    description: Operations on users
+  - name: Rentals
+    description: Operations on rentals
+  - name: Messages
+    description: Operations on messages
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      description: Create a new user account with email, name, and password
+      operationId: registerUser
+      requestBody:
+        description: Create a new user account by providing email, name, and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Log user into the system
+      operationId: logUser
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Successful operation
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: No user matching credentials
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Provide information about currently authenticated user
+      operationId: authUserInfo
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+  /api/user/{id}:
+    get:
+      tags:
+        - User
+      summary: Get user from id
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: The id to get the user from
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: No user found matching provided id
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+  /api/rentals:
+    get:
+      tags:
+        - Rentals
+      summary: Get a paginable list of rentals
+      operationId: getRentals
+      parameters:
+        - name: page
+          in: query
+          description: The page number to display
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: The number of rentals to display on one page
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginableRentalList'
+        '404':
+          description: No rental found
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+    post:
+      tags:
+        - Rentals
+      summary: Create a new rental ad
+      operationId: createRental
+      requestBody:
+        content:
+          multipart/form-data:
+            schema: 
+              $ref: '#/components/schemas/RentalCreate'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationSuccessMessage'
+              examples:
+                success:
+                  value:
+                    message: Rental created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+    put:
+      tags:
+        - Rentals
+      summary: Edit existing rental ad
+      operationId: updateRental
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalUpdate'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationSuccessMessage'
+              examples:
+                success:
+                  value:
+                    message: Rental updated
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+  /api/rentals/{id}:
+    get:
+      tags:
+        - Rentals
+      summary: Get a rental from id
+      operationId: getRentalById
+      parameters:
+        - name: id
+          in: path
+          description: The id to get the rental from
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Rental'
+        '404':
+          description: No rental found matching provided id
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+  /api/messages:
+    post:
+      tags:
+        - Messages
+      summary: Contact the rental owner, post a message on a rental ad
+      operationId : postMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationSuccessMessage'
+              examples:
+                success:
+                  value:
+                    message: Message sent with success
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security: 
+        - rentals_auth:
+components:
+  schemas:
+    CommonProperties:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          examples: [1]
+        created_at:
+          type: string
+          readOnly: true
+          examples: ["2022/12/25"]
+        updated_at:
+          type: string
+          readOnly: true
+          examples: ["2023/01/16"]
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          examples: ["user@mail.com"]
+        password:
+          type: string
+          writeOnly: true
+          examples: ["some_secure_password_4321"]
+    UserRegister:
+      allOf:
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              examples: [John Smith]
+        - $ref: '#/components/schemas/UserLogin'
+    User:
+      allOf: 
+        - $ref: '#/components/schemas/CommonProperties'
+        - $ref: '#/components/schemas/UserRegister'
+    JwtResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          examples: [eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzIyMDUxNTE5LCJleHAiOjE3MjIwODc1MTl9.7tAqRoTdiilbsEdnl1zlTmm6bDIZt_g0ML8qcmInqnS-I2fFkifKYF-v0Bfmn2fs]
+        expiresIn:
+          type: integer
+          description: The token validity in milliseconds
+          examples: [3600000]
+    RentalUpdate:
+      type: object
+      required:
+        - name
+        - surface
+        - price
+        - description
+      properties:
+        name:
+          type: string
+          description: A title for the rental ad
+          examples: ["Amazing little castle"]
+        surface:
+          type: number
+          description: The surface of the location to rent
+          examples: [45]
+        price:
+          type: number
+          description: The price for one night
+          examples: [60]
+        description:
+          type: string
+          examples: ["Chateau Cardou is available to rent in France on a long term basis between October to June. The Chateau is situated in the eastern part of the Lot-et-Garonne department in South West France, close to Dordogne and the Lot departments."]
+    RentalCreate:
+      allOf:
+        - $ref: '#/components/schemas/RentalUpdate'
+        - type: object
+          required:
+            - picture
+          properties:
+            picture:
+              type: string
+              format: binary
+              description: "An image file in PNG, JPEG, or WebP format"
+              anyOf:
+              - contentMediaType: image/png
+              - contentMediaType: image/jpeg
+              - contentMediaType: image/webp
+    Rental:
+      allOf:
+        - $ref: '#/components/schemas/CommonProperties'
+        - $ref: '#/components/schemas/RentalUpdate'
+        - type: object
+          required:
+            - picture
+          properties:
+            picture:
+              type: string
+              description: "A reachable url of the picture"
+              examples: ["http://localhost/uploads/picture.png"]
+    PaginableRentalList:
+      type: object
+      required:
+        - rentals
+      properties:
+        currentPage:
+          type: integer
+          description: The page currently displayed
+          examples: [2]
+        totalPages:
+          type: integer
+          description: Total number of available pages to display
+          examples: [5]
+        pageSize:
+          type: integer
+          description: Number of rentals to display on a single page
+          examples: [8]
+        totalElements:
+          type: integer
+          description: Total number of rentals to fetch
+          examples: [15]
+        rentals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rental'
+    MessageCreate:
+      type: object
+      required:
+        - message
+        - user_id
+        - rental_id
+      properties:
+        message:
+          type: string
+          description: The message content
+          examples: ["Hello, I would like to know if the rental is still available."]
+        user_id:
+          type: integer
+          description: Id of the rental owner to contact
+          examples: [2]
+        rental_id:
+          description: Id of the rental the message is written for
+          examples: [12]
+    Message:
+      allOf:
+        - $ref: '#/components/schemas/CommonProperties'
+        - $ref: '#/components/schemas/MessageCreate'
+    OperationSuccessMessage:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  securitySchemes:
+    rentals_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Success:
+      description: Successful operation
+    Unauthorized:
+      description: Access token is missing or invalid
+    BadRequest:
+      description: Request has missing or invalid parameters
+    InternalServerError:
+      description: An unexpected error occurred. Please try again later.
+
