@@ -1,12 +1,20 @@
 package snx.rentals.api.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// Add page serialization support
+import static snx.rentals.api.config.SecurityConfig.RENTAL_UPLOAD_WEB;
+
 @Configuration
-@EnableSpringDataWebSupport(
-    pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO
-)
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
+  @Value("${snx.app.upload_dir}")
+  private String UPLOAD_ROOT_DIR;
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler(RENTAL_UPLOAD_WEB + "/**")
+            .addResourceLocations("file:" + UPLOAD_ROOT_DIR + RENTAL_UPLOAD_WEB +"/");
+  }
 }
