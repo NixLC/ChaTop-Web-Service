@@ -20,7 +20,7 @@ import java.time.Instant;
 @Builder(toBuilder = true)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "MESSAGES")
+@Table(name = "messages")
 public class Message implements Serializable, GenericEntity<Message> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +28,11 @@ public class Message implements Serializable, GenericEntity<Message> {
   private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "rental_id")
+  @JoinColumn(name = "rental_id", nullable = false)
   private Rental rental;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
   @Column(name = "message", length = 2000)
@@ -51,7 +51,6 @@ public class Message implements Serializable, GenericEntity<Message> {
     this.rental = entity.getRental();
     this.user = entity.getUser();
     this.message = entity.getMessage();
-    this.updatedAt = Instant.now();
   }
 
   @Override
