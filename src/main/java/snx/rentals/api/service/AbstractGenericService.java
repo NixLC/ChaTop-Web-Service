@@ -3,8 +3,6 @@ package snx.rentals.api.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,7 @@ public abstract class AbstractGenericService<T extends GenericEntity<T>> impleme
   public Page<T> getPage(Pageable pageable) {
     Page<T> page = repository.findAll(pageable);
     if (!page.hasContent()) {
-      throw new EmptyResultDataAccessException("No " + ENTITY + " record found", 1);
+      throw new EntityNotFoundException("No " + ENTITY + " record found");
     }
     return page;
   }
@@ -40,16 +38,13 @@ public abstract class AbstractGenericService<T extends GenericEntity<T>> impleme
   public T create(T newDomain) {
     // Prevent any update of record potentially having the same id
     if (newDomain.getId() != null) {
-      throw new DataIntegrityViolationException("Candidate for " + ENTITY + "record should not have any id");
+      throw new DataIntegrityViolationException("Candidate for " + ENTITY + " creation should have no id set");
     }
     try {
       return repository.save(newDomain);
     }
-    catch (DuplicateKeyException e) {
-      throw new DuplicateKeyException("Cannot insert " + ENTITY + " because a record with the same id already exists into database");
-    }
     catch (DataIntegrityViolationException e) {
-      throw new DataIntegrityViolationException("Cannot insert " + ENTITY + " because it violates some integrity constraints");
+      throw new DataIntegrityViolationException("Cannot create " + ENTITY + " because it violates some integrity constraints");
     }
   }
 
@@ -60,9 +55,6 @@ public abstract class AbstractGenericService<T extends GenericEntity<T>> impleme
     dbDomain.update(transcient);
     try {
       return repository.save(dbDomain);
-    }
-    catch (DuplicateKeyException e) {
-      throw new DuplicateKeyException("Cannot update " + ENTITY + " because a record with the same id already exists into database");
     }
     catch (DataIntegrityViolationException e) {
       throw new DataIntegrityViolationException("Cannot update " + ENTITY + " because it violates some integrity constraints");
@@ -80,6 +72,4 @@ public abstract class AbstractGenericService<T extends GenericEntity<T>> impleme
       throw new DataIntegrityViolationException("Cannot delete " + ENTITY + " because it violates some integrity constraints");
     }
   }
-
-
 }
