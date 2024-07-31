@@ -1,16 +1,27 @@
 package snx.rentals.api.config;
 
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springdoc.core.configuration.SpringDocConfiguration;
+import org.springdoc.core.properties.SpringDocConfigProperties;
+import org.springdoc.core.providers.ObjectMapperProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-@SecurityScheme(
-    name = OpenApiConfig.BEARER_AUTH,
-    description = "Authenticate with JWT bearer token",
-    scheme = "bearer",
-    type = SecuritySchemeType.HTTP,
-    bearerFormat = "JWT",
-    in = SecuritySchemeIn.HEADER)
+@Configuration
 public class OpenApiConfig {
-  public static final String BEARER_AUTH = "Bearer Auth";
+  @Bean
+  @Primary
+  SpringDocConfiguration springDocConfiguration() {
+    return new SpringDocConfiguration();
+  }
+
+  @Bean
+  public SpringDocConfigProperties springDocConfigProperties() {
+    return new SpringDocConfigProperties();
+  }
+
+  @Bean
+  ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties){
+    return new ObjectMapperProvider(springDocConfigProperties);
+  }
 }
