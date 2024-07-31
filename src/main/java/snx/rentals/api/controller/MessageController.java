@@ -1,8 +1,8 @@
 package snx.rentals.api.controller;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +14,16 @@ import snx.rentals.api.model.dto.MessageDto;
 import snx.rentals.api.model.entity.Message;
 import snx.rentals.api.model.entity.Rental;
 import snx.rentals.api.model.entity.User;
+import snx.rentals.api.model.view.DtoViews;
 import snx.rentals.api.service.MessageService;
 
 import java.util.Collections;
 import java.util.Map;
 
-import static snx.rentals.api.config.OpenApiConfig.BEARER_AUTH;
 
 @RestController
 @RequestMapping("/api/messages")
-@Tag(name = "Messages")
-@SecurityRequirement(name = BEARER_AUTH)
+@JsonView({DtoViews.Write.class})
 public class MessageController extends GenericController<Message> {
   private final MessageService messages;
 
@@ -34,7 +33,9 @@ public class MessageController extends GenericController<Message> {
   }
 
   @PostMapping("")
-  HttpEntity<Map<String, String>> post(@RequestBody MessageDto dto) {
+  HttpEntity<Map<String, String>> post(@Valid
+                                       @JsonView(DtoViews.Write.class)
+                                       @RequestBody MessageDto dto) {
     Message message = dto.toEntity();
     try {
       User user = messages.findUser(dto.getUserId());
@@ -43,7 +44,7 @@ public class MessageController extends GenericController<Message> {
       message.setRental(rental);
     }
     catch (EntityNotFoundException e) {
-      final String errorMsg = "Cannot insert " + Message.class.getSimpleName() + " because it violates some integrity constraints";
+      final String errorMsg = "Cannot create " + Message.class.getSimpleName();
       throw new DataIntegrityViolationException(errorMsg, e);
     }
       messages.create(message);
