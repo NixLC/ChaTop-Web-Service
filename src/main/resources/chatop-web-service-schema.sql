@@ -1,5 +1,5 @@
 --
--- Database schema creation for rentals-service
+-- Database schema creation for chatop-web-service
 --
 CREATE DATABASE  IF NOT EXISTS `rentals` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci */;
 

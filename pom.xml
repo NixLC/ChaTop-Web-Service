@@ -9,7 +9,7 @@
     <relativePath/>
   </parent>
   <groupId>snx</groupId>
-  <artifactId>rentals-service</artifactId>
+  <artifactId>chatop-web-service</artifactId>
   <version>1.0.0</version>
   <name>rentals</name>
   <description>rentals</description>

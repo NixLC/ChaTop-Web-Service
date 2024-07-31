@@ -1,6 +1,6 @@
 spring:
   application:
-    name: rentals-service
+    name: chatop-web-service
   # MariaDB configuration
   datasource:
     hikari:

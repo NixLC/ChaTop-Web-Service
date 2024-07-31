@@ -9,9 +9,9 @@ Java 17 JRE\
 MariaDB or other compatible database (see [parameters](#datasource_driver))
 
 ### Initialize Database
-- As a privileged user, use `rentals-service-schemas.sql` to create the database schema before running the app.
+- As a privileged user, use `chatop-web-service-schemas.sql` to create the database schema before running the app.
 - Create a database user to access the newly created schema (you can adapt `db-user-create.sql`)
-- Then, you might use `rentals-service-sample-data.sql` to insert some sample data to play with.
+- Then, you might use `chatop-web-service-sample-data.sql` to insert some sample data to play with.
 
 ### Security Notice
 **Important:** For security reasons, do not use the default username, password and schema name provided in provided scripts.\
@@ -23,7 +23,8 @@ Additionally, review and adjust the default permissions to follow the principle 
 ## Run commands
 Before executing any of the commands below, make sure you are in the root directory of the application.\
 ```
-cd rentals-service
+cd ChaTop-Web-Service
+
 ```
 
 ## Build
@@ -55,7 +56,7 @@ All parameters listed below are mandatory for the application to work :
 | `--snx.app.host`                                                   | Host where the application is deployed                                              | `localhost`                                                        |
 | `--snx.app.protocol`                                               | Protocol used by the application                                                    | `http`                                                             |
 | `--server.port`                                                    | Port on which the application listens                                               | `3001`                                                             |
-| `--snx.app.upload_dir`                                             | Directory for storing uploaded files<br>(must be an absolute path, no trailing `/`) | `/var/www-data/rentals-service/uploads`                            |
+| `--snx.app.upload_dir`                                             | Directory for storing uploaded files<br>(must be an absolute path, no trailing `/`) | `/var/www-data/chatop-web-service/uploads`                         |
 
 ### Important Information
 
@@ -66,7 +67,7 @@ All parameters listed below are mandatory for the application to work :
 A valid HMAC secret key is given here **as an example** to run the application. **Do not use in production environment.**
 
 ```
-java -jar target/rentals-service-1.0.0.jar \
+java -jar target/chatop-web-service-1.0.0.jar \
 --security.jwt.secret_key=c55272a8769cb4a7d777616d72e7835c7364f472fdecf1a264c36e22a802b9a3 \
 --security.jwt.expiration_time=86400000 \
 --spring.datasource.driver-class-name=org.mariadb.jdbc.Driver \
@@ -76,7 +77,7 @@ java -jar target/rentals-service-1.0.0.jar \
 --snx.app.host=localhost \
 --snx.app.protocol=http \
 --server.port=3001 \
---snx.app.upload_dir=/var/www-data/rentals-service/uploads
+--snx.app.upload_dir=/var/www-data/chatop-web-service/uploads
 ```
 
 ## Make requests

@@ -1,4 +1,4 @@
--- Sample data for rentals-service
+-- Sample data for chatop-web-service
 -- Images URLs might be unreachable
 USE rentals;
 
