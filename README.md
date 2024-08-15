@@ -14,17 +14,17 @@ MariaDB or other compatible database (see [parameters](#datasource_driver))
 - Then, you might use `chatop-web-service-sample-data.sql` to insert some sample data to play with.
 
 ### Security Notice
-**Important:** For security reasons, do not use the default username, password and schema name provided in provided scripts.\
+**Important:** For security reasons, do not use the default username, password and schema name provided in sql scripts in production.\
 Always check sql scripts before running them.
 Ensure you create a unique and strong username and password for the database user and use a custom schema name.\
 Additionally, review and adjust the default permissions to follow the principle of least privilege.
 **Default values provided in those scripts should be used for testing only !**
 
 ## Run commands
-Before executing any of the commands below, make sure you are in the root directory of the application.\
+Before executing any of the commands below, make sure you are in the root directory of the application.
+
 ```
 cd ChaTop-Web-Service
-
 ```
 
 ## Build
