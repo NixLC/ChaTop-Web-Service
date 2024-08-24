@@ -173,35 +173,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       security: 
         - rentals_auth:
-    put:
-      tags:
-        - Rentals
-      summary: Edit existing rental ad
-      operationId: updateRental
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RentalUpdate'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OperationSuccessMessage'
-              examples:
-                success:
-                  value:
-                    message: Rental updated
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      security: 
-        - rentals_auth:
   /api/rentals/{id}:
     get:
       tags:
@@ -218,12 +189,48 @@ paths:
       responses:
         '200':
           description: Successful operation
-          content: 
-            application/json: 
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/Rental'
         '404':
           description: No rental found matching provided id
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - rentals_auth:
+    put:
+      tags:
+        - Rentals
+      summary: Edit existing rental ad
+      operationId: updateRental
+      parameters:
+        - name: id
+          in: path
+          description: The id to get the rental from
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RentalUpdate'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationSuccessMessage'
+              examples:
+                success:
+                  value:
+                    message: Rental updated
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
