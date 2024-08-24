@@ -57,7 +57,7 @@ public class Rental implements Serializable, GenericEntity<Rental> {
   @Column(name = "updated_at", nullable = false)
   private Instant updatedAt;
 
-  @OneToMany(mappedBy = "rental")
+  @OneToMany(mappedBy = "rental", fetch = FetchType.LAZY)
   private Set<Message> messages = new LinkedHashSet<>();
 
   @Override
