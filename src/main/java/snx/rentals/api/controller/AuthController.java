@@ -23,7 +23,7 @@ import snx.rentals.api.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController extends GenericController<User> {
+public class AuthController {
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
   private final UserService users;
@@ -31,7 +31,6 @@ public class AuthController extends GenericController<User> {
 
   public AuthController(UserService service, AuthenticationManager authenticationManager,
                         JwtService jwtService, PasswordEncoder passwordEncoder) {
-    super(service);
     this.users = service;
     this.authenticationManager = authenticationManager;
     this.jwtService = jwtService;
@@ -40,18 +39,18 @@ public class AuthController extends GenericController<User> {
 
   @PostMapping("/register")
   @JsonView({DtoViews.Read.class})
-  public HttpEntity<DTO<User>> register(@Valid
+  public HttpEntity<JwtResponse> register(@Valid
                                         @JsonView(DtoViews.Write.class)
                                         @RequestBody UserDto dto) {
-    dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-    DTO<User> created;
+    LoginDto credentials = new LoginDto(dto.getEmail(), dto.getPassword());
     try {
-      created = create(dto.toEntity());
+      dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+      users.create(dto.toEntity());
     }
     catch (DataIntegrityViolationException e) {
       throw new DataIntegrityViolationException("A user with the same email already exists", e);
     }
-    return ResponseEntity.ok(created);
+    return login(credentials);
   }
 
   @PostMapping("/login")
