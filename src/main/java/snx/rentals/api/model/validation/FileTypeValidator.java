@@ -6,11 +6,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
-public class FileTypeValidator implements ConstraintValidator<ValidFileType, MultipartFile> {
+public class FileTypeValidator implements ConstraintValidator<ValidContentType, MultipartFile> {
   private String[] allowedTypes;
 
   @Override
-  public void initialize(ValidFileType constraintAnnotation) {
+  public void initialize(ValidContentType constraintAnnotation) {
     this.allowedTypes = constraintAnnotation.types();
   }
 
