@@ -10,7 +10,7 @@
   </parent>
   <groupId>snx</groupId>
   <artifactId>chatop-web-service</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>rentals</name>
   <description>rentals</description>
   <properties>
