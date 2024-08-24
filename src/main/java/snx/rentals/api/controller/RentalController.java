@@ -21,7 +21,7 @@ import snx.rentals.api.model.dto.RentalDto;
 import snx.rentals.api.model.dto.WrapperDto;
 import snx.rentals.api.model.entity.Rental;
 import snx.rentals.api.model.entity.User;
-import snx.rentals.api.model.validation.ValidFileType;
+import snx.rentals.api.model.validation.ValidContentType;
 import snx.rentals.api.model.view.DtoViews;
 import snx.rentals.api.service.RentalService;
 
@@ -38,33 +38,34 @@ import static snx.rentals.api.config.SecurityConfig.RENTAL_UPLOAD_WEB;
 @RestController
 @RequestMapping("/api/rentals")
 @Validated
-public class RentalController extends GenericController<Rental> {
+public class RentalController {
   private final RentalService rentals;
+  private final GenericController<Rental> genericController;
   @Value("${snx.app.upload_dir}")
   private String UPLOAD_ROOT_DIR;
 
   public RentalController(RentalService service) {
-    super(service);
     this.rentals = service;
+    this.genericController = new GenericController<>(service);
   }
 
   @GetMapping("")
   public ResponseEntity<WrapperDto<Rental>> getSome(
       @RequestParam(name = "page", defaultValue = "1", required = false) int page,
       @RequestParam(name = "size", defaultValue = "10", required = false) int size) {
-    return ResponseEntity.ok(getPage(page, size));
+    return ResponseEntity.ok(genericController.getPage(page, size));
   }
 
   @GetMapping("/{id}")
   @JsonView(DtoViews.Read.class)
   HttpEntity<DTO<Rental>> getOne(@PathVariable Integer id) {
-    return ResponseEntity.ok(get(id));
+    return ResponseEntity.ok(genericController.get(id));
   }
 
   // Prevent id binding because JPA would try to update the entity instead of creating a new one if its id is found in the database
   // Prevent ownerId binding via request parameters because we shouldn't be able to modify a rental owner
   @InitBinder("rentalDto")
-  public void initBinder(WebDataBinder binder) {
+  private void initBinder(WebDataBinder binder) {
     binder.setDisallowedFields("id");
     binder.setDisallowedFields("ownerId");
   }
@@ -73,7 +74,7 @@ public class RentalController extends GenericController<Rental> {
   HttpEntity<Map<String, String>> createOne(@AuthenticationPrincipal User userDetails,
                                             @Valid
                                             @ModelAttribute RentalDto dto,
-                                            @ValidFileType(types = { "image/jpeg", "image/png", "image/webp" })
+                                            @ValidContentType(types = { "image/jpeg", "image/png", "image/webp" })
                                             @RequestParam("picture") MultipartFile picture) {
     if (picture.isEmpty()) {
       throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, "No file selected");

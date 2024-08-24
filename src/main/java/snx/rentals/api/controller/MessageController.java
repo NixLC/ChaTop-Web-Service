@@ -24,11 +24,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/messages")
 @JsonView({DtoViews.Write.class})
-public class MessageController extends GenericController<Message> {
+public class MessageController {
   private final MessageService messages;
 
   public MessageController(MessageService service) {
-    super(service);
     this.messages = service;
   }
 

@@ -8,9 +8,9 @@ import snx.rentals.api.model.dto.WrapperDto;
 import snx.rentals.api.model.entity.GenericEntity;
 import snx.rentals.api.service.GenericService;
 
-public abstract class GenericController<T extends GenericEntity<T>> {
+public class GenericController<T extends GenericEntity<T>> {
   private final GenericService<T> service;
-  protected final String COLLECTION_NAME;
+  private final String COLLECTION_NAME;
 
   public GenericController(GenericService<T> service) {
     this.service = service;

@@ -15,15 +15,15 @@ import snx.rentals.api.service.UserService;
 
 @RestController
 @RequestMapping("/api/user")
-public class UserController extends GenericController<User> {
-
+public class UserController {
+  private final UserService users;
   public UserController(UserService service) {
-    super(service);
+    this.users = service;
   }
 
   @GetMapping("/{id}")
   @JsonView({DtoViews.Read.class})
   HttpEntity<DTO<User>> getOne(@PathVariable Integer id) {
-    return ResponseEntity.ok(get(id));
+    return ResponseEntity.ok(users.get(id).toDTO());
   }
 }
