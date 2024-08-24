@@ -24,18 +24,18 @@ public class MessageDto implements DTO<Message>{
   private Integer id;
 
   @JsonProperty("rental_id")
-  @NotNull
+  @NotNull(message = "Rental id is required")
   @Digits(integer = 10, fraction = 0)
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private Integer rentalId;
 
   @JsonProperty("user_id")
-  @NotNull
+  @NotNull(message = "User id is required")
   @Digits(integer = 10, fraction = 0)
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private Integer userId;
 
-  @NotBlank
+  @NotBlank(message = "Message content is required and should not be blank")
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private String message;
 

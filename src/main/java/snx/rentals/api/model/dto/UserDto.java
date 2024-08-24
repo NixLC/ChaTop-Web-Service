@@ -22,17 +22,17 @@ public class UserDto implements DTO<User> {
   @JsonView(DtoViews.Read.class)
   private Integer id;
 
-  @NotBlank
-  @Email
+  @Email(message = "Please enter a valid email address")
+  @NotBlank(message = "Email address is required")
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private String email;
 
-  @NotBlank
+  @NotBlank(message = "A username is required and should not be blank")
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private String name;
 
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  @NotBlank
+  @NotBlank(message = "A password is required and should not be blank")
   @JsonView(DtoViews.Write.class)
   private String password;
 

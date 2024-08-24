@@ -27,16 +27,16 @@ public class RentalDto implements DTO<Rental> {
   @JsonView({DtoViews.Read.class})
   private Integer id;
 
-  @NotBlank
+  @NotBlank(message = "Name is required and should not be blank")
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private String name;
 
-  @NotNull
+  @NotNull(message = "Surface is required")
   @Digits(integer = 10, fraction = 2)
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private BigDecimal surface;
 
-  @NotNull
+  @NotNull(message = "Price is required")
   @Digits(integer = 10, fraction = 2)
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private BigDecimal price;
@@ -46,7 +46,7 @@ public class RentalDto implements DTO<Rental> {
   @JsonView({DtoViews.Read.class})
   private String pictureUrl;
 
-  @NotBlank
+  @NotBlank(message = "Description content is required and should not be blank")
   @JsonView({DtoViews.Read.class, DtoViews.Write.class})
   private String description;
 

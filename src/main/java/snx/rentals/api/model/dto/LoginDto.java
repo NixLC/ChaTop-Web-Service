@@ -13,9 +13,9 @@ import snx.rentals.api.model.view.DtoViews;
 @AllArgsConstructor
 @JsonView({DtoViews.Write.class})
 public class LoginDto {
-  @Email
-  @NotBlank
+  @Email(message = "Please enter a valid email address")
+  @NotBlank(message = "Email address is required")
   private String email;
-  @NotBlank
+  @NotBlank(message = "Password is required and should not be blank")
   private String password;
 }
