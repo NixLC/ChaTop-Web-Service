@@ -54,7 +54,7 @@ CREATE TABLE `messages` (
   PRIMARY KEY (`id`),
   KEY `fk_message_rental` (`rental_id`),
   KEY `fk_message_user` (`user_id`),
-  CONSTRAINT `fk_message_rental` FOREIGN KEY (`rental_id`) REFERENCES `rentals` (`id`) ON UPDATE CASCADE,
-  CONSTRAINT `fk_message_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `fk_message_rental` FOREIGN KEY (`rental_id`) REFERENCES `rentals` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `fk_message_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
