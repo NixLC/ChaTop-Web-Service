@@ -12,6 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
   @Value("${snx.app.upload_dir}")
   private String UPLOAD_ROOT_DIR;
 
+  // Map filesystem directory to web location
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler(RENTAL_UPLOAD_WEB + "/**")
