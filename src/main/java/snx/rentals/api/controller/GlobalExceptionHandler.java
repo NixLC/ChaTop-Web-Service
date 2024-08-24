@@ -10,6 +10,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,29 +52,29 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
   public Map<String, Object> handleEntityNotFoundException(Exception ex) {
-    return produceMessages(ex);
+    return produceMessages(ex, true);
   }
 
   @ExceptionHandler
   @ResponseBody
   public ResponseEntity<Map<String, Object>> handleDataAccessException(DataAccessException ex) {
     return switch (ex.getClass().getSimpleName()) {
-      case "DataIntegrityViolationException" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(produceMessages(ex));
-      default -> ResponseEntity.status(HttpStatus.NO_CONTENT).body(produceMessages(ex));
+      case "DataIntegrityViolationException" -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(produceMessages(ex, true));
+      default -> ResponseEntity.status(HttpStatus.NO_CONTENT).body(produceMessages(ex, true));
     };
   }
 
   @ExceptionHandler
   @ResponseBody
   public ResponseEntity<Map<String, Object>> handleHttpServerErrorException(HttpServerErrorException ex) {
-    return ResponseEntity.status(ex.getStatusCode()).body(produceMessages(ex));
+    return ResponseEntity.status(ex.getStatusCode()).body(produceMessages(ex, true));
   }
 
   @ExceptionHandler
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ResponseBody
   public Map<String, Object> handleBadCredentialsException(BadCredentialsException ex) {
-    return produceMessages(ex);
+    return produceMessages(ex, true);
   }
 
   // Handle all non-explicit exception that could happen
@@ -81,7 +82,7 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   public Map<String, Object> handleGenericException(Exception ex) {
-    return produceMessages(ex);
+    return produceMessages(ex, true);
   }
 
   @ExceptionHandler
@@ -92,11 +93,12 @@ public class GlobalExceptionHandler {
     Map<String, List<String>> fieldErrors = new LinkedHashMap<>();
     Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
 
-    for (ConstraintViolation<?> violation : violations) {
-      String propertyName = getLastNode(violation.getPropertyPath());
-      fieldErrors.putIfAbsent(propertyName, new LinkedList<>());
-      fieldErrors.get(propertyName).add(violation.getMessage());
-    }
+    violations.forEach(v -> {
+        String propertyName = getLastNode(v.getPropertyPath());
+        fieldErrors.putIfAbsent(propertyName, new LinkedList<>());
+        fieldErrors.get(propertyName).add(v.getMessage());
+      });
+
     errors.put("timestamp", LocalDateTime.now());
     errors.put("errors", fieldErrors);
     return errors;
@@ -105,17 +107,25 @@ public class GlobalExceptionHandler {
   @ExceptionHandler
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
-  public Map<String, Object> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
-    return produceMessages(ex);
+  public Map<String, Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    return produceMessages(ex, false);
   }
 
-  private static Map<String, Object> produceMessages(Throwable ex) {
+  @ExceptionHandler
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public Map<String, Object> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
+    return produceMessages(ex, true);
+  }
+
+  private static Map<String, Object> produceMessages(Throwable ex, boolean exploreCauses) {
     Map<String, Object> error = new LinkedHashMap<>();
     List<String> messages = new LinkedList<>();
 
-    while (ex != null && ex.getMessage() != null) {
+    while(ex != null && ex.getMessage() != null) {
       messages.add(ex.getMessage());
       ex = ex.getCause();
+      if(!exploreCauses) break;
     }
     error.put("timestamp", LocalDateTime.now());
     error.put("errors", messages);
